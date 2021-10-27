@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>JS Drum Kit</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script lang="text/javascript">
+      const app = (function () {
+        return {
+          data: {
+            keySounds: {
+              A: {
+                name: 'clap',
+                audioSrc: 'sounds/clap.wav',
+              },
+              S: {
+                name: 'hihat',
+                audioSrc: 'sounds/hihat.wav',
+              },
+              D: {
+                name: 'kick',
+                audioSrc: 'sounds/kick.wav',
+              },
+              F: {
+                name: 'openhat',
+                audioSrc: 'sounds/openhat.wav',
+              },
+              G: {
+                name: 'boom',
+                audioSrc: 'sounds/boom.wav',
+              },
+              H: {
+                name: 'ride',
+                audioSrc: 'sounds/ride.wav',
+              },
+              J: {
+                name: 'snare',
+                audioSrc: 'sounds/snare.wav',
+              },
+              K: {
+                name: 'tom',
+                audioSrc: 'sounds/tom.wav',
+              },
+              L: {
+                name: 'tink',
+                audioSrc: 'sounds/tink.wav',
+              },
+            },
+          },
+          viewRender: () => {
+            let $app = document.getElementById('app');
+
+            const $triggerKey = (key, name) => {
+                const $kbd = document.createElement('kbd');
+                $kbd.appendChild(document.createTextNode(key));
+
+                const $spanSound = document.createElement('span');
+                $spanSound.setAttribute('class', 'sound');
+                $spanSound.appendChild(document.createTextNode(name));
+
+                const $root = document.createElement('div');
+                $root.setAttribute('class', 'key');
+                $root.setAttribute('data-key', key);
+                $root.appendChild($kbd);
+                $root.appendChild($spanSound);
+
+                return $root;
+            }
+
+            const $triggerKeyList = (keySounds) => {
+                const $root = document.createElement('div');
+                $root.setAttribute('class', 'keys');
+
+                for (const key in keySounds) {
+                    const element = keySounds[key];
+                    $root.appendChild($triggerKey(key, element.name));
+                }
+
+                return $root;
+            };
+
+            const $audioResource = (key, audioSrc) => {
+                const $root = document.createElement('audio');
+                $root.setAttribute('data-key', key);
+                $root.setAttribute('src', audioSrc);
+
+                return $root;
+            }
+
+            const $audioResourceList = (keySounds) => {
+                const $root = document.createElement('div');
+
+                for (const key in keySounds) {
+                    const element = keySounds[key];
+                    $root.appendChild($audioResource(key, element.audioSrc));
+                }
+
+                return $root;
+            }
+
+            $app.appendChild($triggerKeyList(this.data.keySounds));
+            $app.appendChild($audioResourceList(this.data.keySounds));
+          },
+          eventHandler: () => {
+            document.addEventListener('keydown', (e) => {
+                const triggerKey = e.key.toUpperCase();
+                if (!!!this.data.keySounds[triggerKey]) return;
+
+                const key = document.querySelector(`div[data-key="${triggerKey}"]`);
+                const audio = document.querySelector(`audio[data-key="${triggerKey}"]`);
+
+                key.classList.add('playing');
+                audio.currentTime = 0;
+                audio.play();
+                console.log(triggerKey);
+            });
+
+            document.addEventListener('keyup', (e) => {
+                const triggerKey = e.key.toUpperCase();
+                if (!!!this.data.keySounds[triggerKey]) return;
+
+                const key = document.querySelector(`div[data-key="${triggerKey}"]`);
+
+                key.classList.remove('playing');
+            });
+          },
+        };
+      })();
+
+      window.onload = (function (app) {
+        this.data = app.data;
+        app.viewRender();
+        app.eventHandler();
+      })(app);
+    </script>
+  </body>
+</html>
